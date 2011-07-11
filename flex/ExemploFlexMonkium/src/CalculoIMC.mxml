@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" minWidth="955" minHeight="600">
+	
+	<mx:Script>
+		<![CDATA[
+			
+			private function btCalcularClick(event:MouseEvent):void 
+			{
+				var peso:Number = Number(txPeso.text);
+				var altura:Number = Number(txAltura.text.replace(",", "."));
+				
+				if (peso && altura)
+				{
+					var imc:Number = calcularIMC(peso, altura);
+					var descricao:String = avaliarDescricao(imc); 
+					
+					lbResultado.text = numberFormatter.format(imc) + " (" + descricao + ")";
+				}
+				else 
+				{
+					lbResultado.text = "";
+				}
+			}
+			
+			private function calcularIMC(peso:Number, altura:Number):Number
+			{
+				return peso / Math.pow(altura, 2);
+			}
+			
+			private function avaliarDescricao(imc:Number):String
+			{
+				if (imc < 17) 
+					return "Muito abaixo do peso";
+				
+				if (imc < 18.50)
+					return "Abaixo do peso";
+				
+				if (imc < 25)
+					return "Peso normal";
+				
+				if (imc < 30)
+					return "Acima do peso";
+				
+				if (imc < 35)
+					return "Obesidade I";
+				
+				if (imc < 40)
+					return "Obesidade II (severa)";
+				
+				return "Obesidade III (mórbida)";
+				
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<mx:NumberFormatter id="numberFormatter" precision="2" rounding="none"
+						decimalSeparatorTo=","
+						thousandsSeparatorTo="."
+						useThousandsSeparator="true"
+						useNegativeSign="true" />
+	
+	<mx:Panel title="Cálculo IMC" layout="vertical">
+		<mx:Form>
+			<mx:FormItem label="Peso:">
+				<mx:TextInput id="txPeso"/>
+			</mx:FormItem>
+			<mx:FormItem label="Altura:">
+				<mx:TextInput id="txAltura"/>
+			</mx:FormItem>
+			<mx:FormItem label="Resultado:">
+				<mx:Label id="lbResultado"/>
+			</mx:FormItem>
+		</mx:Form>
+		
+		<mx:ControlBar>
+			<mx:Button id="btCalcular" label="Calcular" click="btCalcularClick(event)"/>
+		</mx:ControlBar>
+		
+	</mx:Panel>
+</mx:Application>

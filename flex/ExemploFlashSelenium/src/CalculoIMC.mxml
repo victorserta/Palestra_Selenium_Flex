@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   xmlns:local="*"
+			   minWidth="955" minHeight="600" 
+			   creationComplete="appCreationComplete(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			
+			private function appCreationComplete(event:Event):void 
+			{
+				configurarCallbacksTeste();
+				notificarCriacaoCompleta();
+			}
+			
+			private function configurarCallbacksTeste():void
+			{
+				//Adiciona callbacks JavaScript. Assim que será possível o Selenium acessar informações
+				ExternalInterface.addCallback("preencherPeso", preencherPeso);
+				ExternalInterface.addCallback("preencherAltura", preencherAltura);
+				ExternalInterface.addCallback("clickEmCalcular", clickEmCalcular);
+				ExternalInterface.addCallback("getResultado", getResultado);
+			}
+			
+			private function notificarCriacaoCompleta():void
+			{
+				//Notifica que a aplicação foi criada e pode ser testada
+				ExternalInterface.call("appCreationComplete");
+			}
+			
+			private function teste():Boolean
+			{
+				return true;
+			}
+			
+			private function getResultado():String {
+				return lbResultado.text;
+			}
+			
+			private function preencherPeso(valor:String):void {
+				txPeso.text = valor;
+			}
+			
+			private function preencherAltura(valor:String):void {
+				txAltura.text = valor;
+			}
+			
+			private function clickEmCalcular():void {
+				btCalcular.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+			}
+			
+			private function btCalcularClick(event:MouseEvent):void 
+			{
+				var peso:Number = numberFormatter.parse(txPeso.text).value;
+				var altura:Number = numberFormatter.parse(txAltura.text).value;
+				
+				if (peso && altura)
+				{
+					var imc:Number = calcularIMC(peso, altura);
+					var descricao:String = avaliarDescricao(imc); 
+					
+					lbResultado.text = numberFormatter.format(imc) + " (" + descricao + ")";
+				}
+				else 
+				{
+					lbResultado.text = "";
+				}
+			}
+			
+			private function calcularIMC(peso:Number, altura:Number):Number
+			{
+				return peso / Math.pow(altura, 2);
+			}
+			
+			private function avaliarDescricao(imc:Number):String
+			{
+				if (imc < 1700) 
+					return "Muito abaixo do peso";
+
+				if (imc < 18.50)
+					return "Abaixo do peso";
+
+				if (imc < 25)
+					return "Peso normal";
+
+				if (imc < 30)
+					return "Acima do peso";
+
+				if (imc < 35)
+					return "Obesidade I";
+
+				if (imc < 40)
+					return "Obesidade II (severa)";
+
+				return "Obesidade III (mórbida)";
+
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<s:NumberFormatter id="numberFormatter" decimalSeparator="," groupingSeparator="." fractionalDigits="2"/>
+	</fx:Declarations>
+	
+	<s:Panel title="Cálculo IMC">
+		<s:layout>
+			<s:VerticalLayout/>
+		</s:layout>
+
+		<s:Form>
+			<s:FormItem label="Peso:">
+				<s:TextInput id="txPeso"/>
+			</s:FormItem>
+			<s:FormItem label="Altura:">
+				<s:TextInput id="txAltura"/>
+			</s:FormItem>
+			<s:FormItem label="Resultado:">
+				<s:Label id="lbResultado"/>
+			</s:FormItem>
+		</s:Form>
+		
+		<s:controlBarContent>
+			<s:Button id="btCalcular" label="Calcular" click="btCalcularClick(event)"/>	
+		</s:controlBarContent>
+		
+	</s:Panel>
+</s:Application>
